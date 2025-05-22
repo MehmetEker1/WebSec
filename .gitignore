@@ -1,0 +1,16 @@
+# Model dosyaları
+*.bin
+*.pt
+*.pkl
+
+# Sanal ortamlar
+venv/
+.env/
+
+# Geçici sistem dosyaları
+__pycache__/
+.DS_Store
+
+# IDE klasörleri
+.vscode/
+.idea/
