@@ -14,3 +14,10 @@ __pycache__/
 # IDE klasörleri
 .vscode/
 .idea/
+
+# Secret keys
+debug.log
+cert/key.pem
+*.pem
+*.key
+.env
