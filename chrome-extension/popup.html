@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSec Durumu</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 10px;
+      width: 250px;
+    }
+    .status-safe {
+      color: green;
+      font-weight: bold;
+    }
+    .status-danger {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h3>WebSec Güvenlik Durumu</h3>
+  <p id="siteStatus">İçerik kontrol edilmedi.</p>
+  <button id="checkButton">İçeriği Kontrol Et</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>

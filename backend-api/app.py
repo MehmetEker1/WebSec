@@ -1,3 +1,4 @@
+from flask_cors import CORS
 from flask import Flask, request, jsonify
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
@@ -5,6 +6,7 @@ import pickle
 import os
 
 app = Flask(__name__)
+CORS(app)  # 🔥 CORS izinleri için şart
 
 device = torch.device("cpu")
 MODEL_PATH = "../models/bert-turkish-finetuned"
@@ -78,5 +80,6 @@ def warmup_model():
 
 if __name__ == "__main__":
     warmup_model()
-    print("🚀 Flask API başlatılıyor (http://localhost:5005)")
-    app.run(debug=True, port=5005)
+    print("🚀 Flask API başlatılıyor (https://localhost:5005)")
+    app.run(debug=True, port=5005, ssl_context=("../cert/cert.pem", "../cert/key.pem"))
+

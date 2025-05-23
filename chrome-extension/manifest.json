@@ -1,14 +1,14 @@
 {
     "manifest_version": 3,
-    "name": "WebSec - Zararlı İçerik Kontrolü",
-    "description": "Ziyaret edilen sayfadaki içeriği analiz ederek zararlı olup olmadığını tespit eder.",
+    "name": "WebSec - Zararlı İçerik Analizi",
+    "description": "Ziyaret edilen sitelerin güvenliğini kontrol eder",
     "version": "1.0",
+    "host_permissions": [
+        "https://localhost:5005/*"
+    ],
     "permissions": [
         "scripting",
         "activeTab"
-    ],
-    "host_permissions": [
-        "<all_urls>"
     ],
     "background": {
         "service_worker": "background.js"
@@ -21,17 +21,6 @@
             "128": "icon.png"
         }
     },
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content.js"
-            ],
-            "run_at": "document_idle"
-        }
-    ],
     "icons": {
         "16": "icon.png",
         "48": "icon.png",
