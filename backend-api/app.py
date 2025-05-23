@@ -1,17 +1,31 @@
 from flask import Flask, request, jsonify
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
+import pickle
+import os
 
 app = Flask(__name__)
 
 device = torch.device("cpu")
 MODEL_PATH = "../models/bert-turkish-finetuned"
 
+# Model ve tokenizer yükleniyor
 tokenizer = BertTokenizer.from_pretrained(MODEL_PATH)
 model = BertForSequenceClassification.from_pretrained(MODEL_PATH)
 model.to(device)
 model.eval()
 
+# known_domains.pkl yükleniyor
+KNOWN_DOMAINS_PATH = "../data/known_domains.pkl"
+if os.path.exists(KNOWN_DOMAINS_PATH):
+    with open(KNOWN_DOMAINS_PATH, "rb") as f:
+        known_domains = pickle.load(f)
+    print(f"✅ {len(known_domains)} domain belleğe yüklendi.")
+else:
+    known_domains = set()
+    print("⚠️ known_domains.pkl bulunamadı.")
+
+# İçerik tahmini endpoint'i
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json()
@@ -36,7 +50,23 @@ def predict():
         "confidence": confidence
     })
 
-# MODELİ LAZY LOAD'DAN KURTAR
+# URL kontrol endpoint'i
+@app.route("/url-check", methods=["POST"])
+def check_url():
+    data = request.get_json()
+    domain = data.get("domain", "").lower().replace("www.", "").strip()
+
+    if not domain:
+        return jsonify({"error": "Geçersiz domain"}), 400
+
+    is_safe = domain in known_domains
+
+    return jsonify({
+        "domain": domain,
+        "safe": is_safe
+    })
+
+# Lazy-load yerine model 1 kere çalıştırılsın
 def warmup_model():
     print("🔥 İlk test çağrısı yapılıyor (warmup)...")
     dummy = "Bu sadece test içindir."
