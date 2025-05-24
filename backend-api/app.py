@@ -83,3 +83,4 @@ if __name__ == "__main__":
     print("🚀 Flask API başlatılıyor (https://localhost:5005)")
     app.run(debug=True, port=5005, ssl_context=("../cert/cert.pem", "../cert/key.pem"))
 
+
