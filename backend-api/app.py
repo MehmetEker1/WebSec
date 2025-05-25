@@ -27,6 +27,22 @@ else:
     known_domains = set()
     print("⚠️ known_domains.pkl bulunamadı.")
 
+# USOM kara listesi yükleniyor (YENİ EKLENDİ)
+USOM_LIST_PATH = "../data/url-list.txt"
+def load_usom():
+    domains = set()
+    if os.path.exists(USOM_LIST_PATH):
+        with open(USOM_LIST_PATH, "r") as f:
+            for line in f:
+                domain = line.strip().lower()
+                domain = domain.replace("http://", "").replace("https://", "").split("/")[0]
+                if domain:
+                    domains.add(domain)
+    print(f"🛑 USOM kara listesi yüklendi: {len(domains)} domain")
+    return domains
+
+usom_blocked = load_usom()
+
 # İçerik tahmini endpoint'i
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -52,7 +68,7 @@ def predict():
         "confidence": confidence
     })
 
-# URL kontrol endpoint'i
+# URL kontrol endpoint'i (YENİ HALİ)
 @app.route("/url-check", methods=["POST"])
 def check_url():
     data = request.get_json()
@@ -61,14 +77,24 @@ def check_url():
     if not domain:
         return jsonify({"error": "Geçersiz domain"}), 400
 
-    is_safe = domain in known_domains
+    if domain in known_domains:
+        return jsonify({
+            "domain": domain,
+            "status": "safe"
+        })
+
+    if domain in usom_blocked:
+        return jsonify({
+            "domain": domain,
+            "status": "malicious"
+        })
 
     return jsonify({
         "domain": domain,
-        "safe": is_safe
+        "status": "analyze"
     })
 
-# Lazy-load yerine model 1 kere çalıştırılsın
+# Lazy-load yerine model 1 kere çalıştırılsın (İSTEĞE BAĞLI)
 def warmup_model():
     print("🔥 İlk test çağrısı yapılıyor (warmup)...")
     dummy = "Bu sadece test içindir."
@@ -82,5 +108,3 @@ if __name__ == "__main__":
     warmup_model()
     print("🚀 Flask API başlatılıyor (https://localhost:5005)")
     app.run(debug=True, port=5005, ssl_context=("../cert/cert.pem", "../cert/key.pem"))
-
-

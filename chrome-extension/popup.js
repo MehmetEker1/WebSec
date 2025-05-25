@@ -17,10 +17,13 @@ document.addEventListener("DOMContentLoaded", function () {
       })
         .then(res => res.json())
         .then(data => {
-          if (data.safe) {
+          if (data.status === "safe") {
             statusEl.textContent = "✅ Güvenli Site (Top 1M listesinde)";
             statusEl.className = "status-safe";
-          } else {
+          } else if (data.status === "malicious") {
+            statusEl.textContent = "⚠️ Zararlı Site (USOM kara listesinde)";
+            statusEl.className = "status-danger";
+          } else if (data.status === "analyze") {
             statusEl.textContent = "🧠 İçerik analizi başlatılıyor...";
             statusEl.className = "";
 
@@ -44,6 +47,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
               });
             });
+          } else {
+            statusEl.textContent = "❌ Bilinmeyen bir hata oluştu";
+            statusEl.className = "";
           }
         })
         .catch(err => {
