@@ -32,6 +32,13 @@ function analyzeContent() {
 
     Promise.all(promises)
         .then(results => {
+            // === CSV'ye KAYIT ===
+            fetch("https://localhost:5005/save-labels", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ results })
+            });
+
             const maliciousChunks = results.filter(r => r.label === 1);
             const ratio = maliciousChunks.length / results.length;
             const isMalicious = ratio > 0.3;

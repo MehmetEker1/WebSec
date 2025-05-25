@@ -4,9 +4,10 @@ from transformers import BertTokenizer, BertForSequenceClassification
 import torch
 import pickle
 import os
+import csv
 
 app = Flask(__name__)
-CORS(app)  # 🔥 CORS izinleri için şart
+CORS(app)  # CORS izinleri için şart
 
 device = torch.device("cpu")
 MODEL_PATH = "../models/bert-turkish-finetuned"
@@ -27,7 +28,7 @@ else:
     known_domains = set()
     print("⚠️ known_domains.pkl bulunamadı.")
 
-# USOM kara listesi yükleniyor (YENİ EKLENDİ)
+# USOM kara listesi yükleniyor
 USOM_LIST_PATH = "../data/url-list.txt"
 def load_usom():
     domains = set()
@@ -42,6 +43,21 @@ def load_usom():
     return domains
 
 usom_blocked = load_usom()
+
+# Analiz edilen chunk'ları CSV'ye ekle
+CSV_PATH = "../data/analyzed_chunks.csv"
+def append_chunks_to_csv(chunks):
+    file_exists = os.path.isfile(CSV_PATH)
+    with open(CSV_PATH, "a", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+        if not file_exists:
+            writer.writerow(["chunk", "label"])
+        for item in chunks:
+            writer.writerow([
+                item.get("text", ""),
+                item.get("label", "")
+            ])
+    print(f"✅ {len(chunks)} satır eklendi → {CSV_PATH}")
 
 # İçerik tahmini endpoint'i
 @app.route("/predict", methods=["POST"])
@@ -68,7 +84,17 @@ def predict():
         "confidence": confidence
     })
 
-# URL kontrol endpoint'i (YENİ HALİ)
+# Chunk batch'i CSV'ye ekle endpoint'i
+@app.route("/save-labels", methods=["POST"])
+def save_labels():
+    data = request.get_json()
+    results = data.get("results", [])
+    if not isinstance(results, list) or not results:
+        return jsonify({"error": "Geçerli 'results' listesi gönderilmeli."}), 400
+    append_chunks_to_csv(results)
+    return jsonify({"message": "CSV'ye eklendi", "count": len(results)})
+
+# URL kontrol endpoint'i (güvenli, zararlı, analiz)
 @app.route("/url-check", methods=["POST"])
 def check_url():
     data = request.get_json()
@@ -94,7 +120,6 @@ def check_url():
         "status": "analyze"
     })
 
-# Lazy-load yerine model 1 kere çalıştırılsın (İSTEĞE BAĞLI)
 def warmup_model():
     print("🔥 İlk test çağrısı yapılıyor (warmup)...")
     dummy = "Bu sadece test içindir."
