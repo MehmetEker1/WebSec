@@ -1,10 +1,42 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const statusEl = document.getElementById("siteStatus");
+  const statusEl = document.getElementById("mainStatus");
   const buttonEl = document.getElementById("checkButton");
+  const spinner = document.getElementById("spinner");
+  const resultIcon = document.getElementById("resultIcon");
+
+  // Sonucu ikonla göster
+  function setResultIcon(status) {
+    if (status === "safe") {
+      resultIcon.innerHTML = `<svg width="58" height="58" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="11" fill="#1d2a23" stroke="#57d087" stroke-width="2.5"/>
+        <path d="M8 13.5l2.5 2.5 5-5" stroke="#57d087" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+      resultIcon.className = "big-icon safe";
+    } else if (status === "danger") {
+      resultIcon.innerHTML = `<svg width="58" height="58" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="11" fill="#27181b" stroke="#ff6371" stroke-width="2.5"/>
+        <path d="M9.3 9.3l5.4 5.4M14.7 9.3l-5.4 5.4" stroke="#ff6371" stroke-width="2.3" stroke-linecap="round"/>
+      </svg>`;
+      resultIcon.className = "big-icon danger";
+    } else {
+      resultIcon.innerHTML = ""; // Yüklenirken veya hata olunca ikon yok
+      resultIcon.className = "big-icon loading";
+    }
+  }
+
+  function showLoading() {
+    setResultIcon(null);
+    spinner.style.display = "flex";
+    statusEl.textContent = "İçerik analiz ediliyor...";
+    statusEl.className = "loading";
+  }
+
+  function hideLoading() {
+    spinner.style.display = "none";
+  }
 
   buttonEl.addEventListener("click", () => {
-    statusEl.textContent = "🔎 Domain kontrol ediliyor...";
-    statusEl.className = "";
+    showLoading();
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tab = tabs[0];
@@ -18,58 +50,64 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(res => res.json())
         .then(data => {
           if (data.status === "safe") {
-            statusEl.textContent = "✅ Güvenli Site (Top 1M listesinde)";
-            statusEl.className = "status-safe";
+            hideLoading();
+            setResultIcon("safe");
+            statusEl.textContent = "Güvenli Site (Top 1M listesinde)";
+            statusEl.className = "safe";
           } else if (data.status === "malicious") {
-            statusEl.textContent = "⚠️ Zararlı Site (USOM kara listesinde)";
-            statusEl.className = "status-danger";
+            hideLoading();
+            setResultIcon("danger");
+            statusEl.textContent = "Zararlı Site (USOM kara listesinde)";
+            statusEl.className = "danger";
           } else if (data.status === "analyze") {
-            statusEl.textContent = "🧠 İçerik analizi başlatılıyor...";
-            statusEl.className = "";
-
+            showLoading();
             chrome.scripting.executeScript({
               target: { tabId: tab.id },
               files: ["content.js"]
             }, () => {
               if (chrome.runtime.lastError) {
-                console.error("❌ content.js yüklenemedi:", chrome.runtime.lastError.message);
-                statusEl.textContent = "❌ İçerik analizi modülü yüklenemedi.";
+                hideLoading();
+                statusEl.textContent = "İçerik analizi modülü yüklenemedi.";
+                setResultIcon("danger");
+                statusEl.className = "danger";
                 return;
               }
-
               chrome.tabs.sendMessage(tab.id, { action: "analyzeContent" }, (res) => {
-                if (chrome.runtime.lastError) {
-                  console.error("❌ analyzeContent mesajı gönderilemedi:", chrome.runtime.lastError.message);
-                  statusEl.textContent = "İçerik analiz ediliyor";
-                } else {
-                  console.log("✅ analyzeContent mesajı başarıyla gönderildi.");
-                  statusEl.textContent = "⏳ İçerik analiz ediliyor...";
-                }
+                showLoading();
               });
             });
           } else {
-            statusEl.textContent = "❌ Bilinmeyen bir hata oluştu";
-            statusEl.className = "";
+            hideLoading();
+            setResultIcon("danger");
+            statusEl.textContent = "Bilinmeyen bir hata oluştu";
+            statusEl.className = "danger";
           }
         })
         .catch(err => {
-          console.error("❌ URL kontrol hatası:", err);
-          statusEl.textContent = "❌ Hata oluştu (domain kontrol edilemedi)";
+          hideLoading();
+          setResultIcon("danger");
+          statusEl.textContent = "Hata oluştu (domain kontrol edilemedi)";
+          statusEl.className = "danger";
         });
     });
   });
 
+  // İçerik analiz sonucu mesajı
   chrome.runtime.onMessage.addListener((message) => {
+    hideLoading();
     if (message.action === "setStatus") {
       if (message.status === "malicious") {
-        statusEl.textContent = "⚠️ Zararlı içerik tespit edildi!";
-        statusEl.className = "status-danger";
+        setResultIcon("danger");
+        statusEl.textContent = "Zararlı içerik tespit edildi!";
+        statusEl.className = "danger";
       } else if (message.status === "safe") {
-        statusEl.textContent = "✅ İçerik güvenli";
-        statusEl.className = "status-safe";
+        setResultIcon("safe");
+        statusEl.textContent = "İçerik güvenli";
+        statusEl.className = "safe";
       } else {
-        statusEl.textContent = "❌ İçerik analizi sırasında hata oluştu";
-        statusEl.className = "";
+        setResultIcon("danger");
+        statusEl.textContent = "İçerik analizi sırasında hata oluştu";
+        statusEl.className = "danger";
       }
     }
   });

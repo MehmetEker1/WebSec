@@ -2,28 +2,134 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>WebSec Durumu</title>
+  <title>WebSec Güvenlik Durumu</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 10px;
-      width: 250px;
+      font-family: 'SF Pro Display', 'Inter', Arial, sans-serif;
+      background: #181c20;
+      color: #eaeaea;
+      margin: 0;
+      padding: 0;
+      min-width: 300px;
+      min-height: 280px;
+      border-radius: 18px;
+      box-shadow: 0 4px 16px #10131a44;
     }
-    .status-safe {
-      color: green;
-      font-weight: bold;
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 18px 16px 18px;
     }
-    .status-danger {
-      color: red;
+    .brand {
       font-weight: bold;
+      letter-spacing: 0.5px;
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      color: #68d38d;
+      display: flex;
+      align-items: center;
+    }
+    .brand svg {
+      width: 30px;
+      height: 30px;
+      margin-right: 8px;
+      margin-bottom: 3px;
+    }
+    #mainStatus {
+      margin: 0 0 6px 0;
+      font-size: 1.24rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      color: #fff;
+      text-align: center;
+      min-height: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .big-icon {
+      margin: 16px 0 10px 0;
+      height: 58px;
+      width: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .safe {
+      color: #57d087;
+    }
+    .danger {
+      color: #ff6371;
+    }
+    .loading {
+      color: #68a0fa;
+    }
+    #spinner {
+      display: none;
+      margin: 18px 0 14px 0;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+    }
+    .check-btn {
+      margin-top: 14px;
+      font-size: 1.08rem;
+      padding: 10px 22px;
+      background: #232a34;
+      color: #eaeaea;
+      border: none;
+      border-radius: 10px;
+      transition: background 0.18s;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0002;
+    }
+    .check-btn:hover {
+      background: #2a8c55;
+      color: #fff;
+    }
+    /* Extra: Apple-like switcher shadow for the popup box itself */
+    html {
+      background: transparent;
     }
   </style>
 </head>
 <body>
-  <h3>WebSec Güvenlik Durumu</h3>
-  <p id="siteStatus">İçerik kontrol edilmedi.</p>
-  <button id="checkButton">İçeriği Kontrol Et</button>
+  <div class="container">
+    <div class="brand">
+      <!-- Basit shield/koruma SVG ikonu -->
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 21c7-3 7-8 7-10V5l-7-3-7 3v6c0 2 0 7 7 10z" stroke="#68d38d" stroke-width="2.2" fill="#232a34"/>
+        <path d="M9.5 12.5l2.5 2.5 4-4" stroke="#68d38d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      WebSec
+    </div>
 
+    <div class="big-icon" id="resultIcon"></div>
+
+    <div id="mainStatus">İçerik kontrol edilmedi.</div>
+
+    <div id="spinner">
+      <!-- Modern Apple tarzı SVG spinner -->
+      <svg width="48" height="48" viewBox="0 0 44 44" stroke="#68a0fa">
+        <g fill="none" fill-rule="evenodd" stroke-width="4">
+          <circle cx="22" cy="22" r="20" stroke-opacity="0.15"/>
+          <path d="M42 22c0-11.046-8.954-20-20-20">
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="0 22 22"
+              to="360 22 22"
+              dur="0.9s"
+              repeatCount="indefinite"/>
+          </path>
+        </g>
+      </svg>
+    </div>
+
+    <button class="check-btn" id="checkButton">İçeriği Kontrol Et</button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>

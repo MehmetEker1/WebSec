@@ -10,7 +10,7 @@ function analyzeContent() {
         return;
     }
 
-    function chunkText(text, size = 8) {
+    function chunkText(text, size = 5) {
         const words = text.split(/\s+/);
         const chunks = [];
         for (let i = 0; i < words.length; i += size) {
@@ -19,7 +19,7 @@ function analyzeContent() {
         return chunks;
     }
 
-    const chunks = chunkText(rawText).slice(0, 30);
+    const chunks = chunkText(rawText, 5).slice(0, 100);
     const promises = chunks.map(chunk =>
         fetch("https://localhost:5005/predict", {
             method: "POST",
