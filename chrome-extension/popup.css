@@ -1,10 +1,17 @@
+:root {
+    --popup-bg: #181c20;
+    --text-color: #eaeaea;
+}
+
 body {
     margin: 0;
     padding: 0;
-    background: #181c20;
+    background: var(--popup-bg, #181c20);
+    color: var(--text-color, #eaeaea);
     font-family: 'SF Pro Display', 'Inter', Arial, sans-serif;
     min-width: 330px;
     min-height: 350px;
+    transition: background 0.3s, color 0.3s;
 }
 
 .container {
@@ -39,6 +46,15 @@ body {
     font-size: 1.24rem;
     color: #68d38d;
     margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+}
+
+.brand svg {
+    width: 30px;
+    height: 30px;
+    margin-right: 8px;
+    margin-bottom: 3px;
 }
 
 .domain {
@@ -53,7 +69,7 @@ body {
     margin: 0 0 6px 0;
     font-size: 1.21rem;
     font-weight: 500;
-    color: #fff;
+    color: inherit;
     text-align: center;
     min-height: 26px;
     display: flex;
@@ -110,59 +126,48 @@ body {
     color: #fff;
 }
 
+/* ----------- Tema switcher satırı ve ikonları ----------- */
 .theme-toggle-row {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    margin-top: 16px;
-    font-size: 0.98rem;
-    opacity: 0.88;
+    gap: 0.3rem;
+    margin-top: 15px;
 }
 
-/* Modern switch for theme toggle */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
+.theme-icon {
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #313438;
-    transition: 0.2s;
-    border-radius: 18px;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    padding: 3px;
+    transition: background 0.22s, border 0.22s;
+    border: 2.5px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 4px;
-    bottom: 3px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: 0.2s;
-    box-shadow: 0 1.5px 5px #101a2c29;
+.theme-icon.selected {
+    background: #1e242d1e;
+    border: 2.5px solid #68d38d;
 }
 
-input:checked+.slider {
-    background-color: #68d38d;
+.theme-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
-input:checked+.slider:before {
-    transform: translateX(18px);
+/* ----------- Responsive ----------- */
+@media (max-width: 370px) {
+
+    body,
+    .container {
+        min-width: 240px;
+    }
+
+    .brand {
+        font-size: 0.96rem;
+    }
 }

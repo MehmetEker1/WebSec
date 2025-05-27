@@ -4,16 +4,23 @@
   <meta charset="UTF-8">
   <title>WebSec Güvenlik Durumu</title>
   <style>
+    :root {
+      --popup-bg-dark: #181c20;
+      --popup-bg-light: #f7f8fa;
+      --text-dark: #eaeaea;
+      --text-light: #191b1e;
+    }
     body {
       font-family: 'SF Pro Display', 'Inter', Arial, sans-serif;
-      background: #181c20;
-      color: #eaeaea;
+      background: var(--popup-bg, #181c20);
+      color: var(--text-color, #eaeaea);
       margin: 0;
       padding: 0;
       min-width: 300px;
       min-height: 280px;
       border-radius: 18px;
       box-shadow: 0 4px 16px #10131a44;
+      transition: background 0.3s, color 0.3s;
     }
     .container {
       display: flex;
@@ -41,7 +48,7 @@
       font-size: 1.24rem;
       font-weight: 500;
       letter-spacing: 0.01em;
-      color: #fff;
+      color: inherit;
       text-align: center;
       min-height: 25px;
       display: flex;
@@ -56,15 +63,9 @@
       align-items: center;
       justify-content: center;
     }
-    .safe {
-      color: #57d087;
-    }
-    .danger {
-      color: #ff6371;
-    }
-    .loading {
-      color: #68a0fa;
-    }
+    .safe { color: #57d087; }
+    .danger { color: #ff6371; }
+    .loading { color: #68a0fa; }
     #spinner {
       display: none;
       margin: 18px 0 14px 0;
@@ -89,16 +90,36 @@
       background: #2a8c55;
       color: #fff;
     }
-    /* Extra: Apple-like switcher shadow for the popup box itself */
-    html {
-      background: transparent;
+    .theme-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      margin-top: 15px;
+    }
+    .theme-icon {
+      cursor: pointer;
+      width: 27px;
+      height: 27px;
+      border-radius: 8px;
+      padding: 3px;
+      transition: background 0.22s;
+      border: 2.5px solid transparent;
+    }
+    .theme-icon.selected {
+      background: #1e242d1e;
+      border: 2.5px solid #68d38d;
+    }
+    /* Responsive */
+    @media (max-width: 370px) {
+      body, .container { min-width: 240px; }
+      .brand { font-size: 0.96rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="brand">
-      <!-- Basit shield/koruma SVG ikonu -->
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M12 21c7-3 7-8 7-10V5l-7-3-7 3v6c0 2 0 7 7 10z" stroke="#68d38d" stroke-width="2.2" fill="#232a34"/>
         <path d="M9.5 12.5l2.5 2.5 4-4" stroke="#68d38d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -107,28 +128,43 @@
     </div>
 
     <div class="big-icon" id="resultIcon"></div>
-
     <div id="mainStatus">İçerik kontrol edilmedi.</div>
-
     <div id="spinner">
-      <!-- Modern Apple tarzı SVG spinner -->
       <svg width="48" height="48" viewBox="0 0 44 44" stroke="#68a0fa">
         <g fill="none" fill-rule="evenodd" stroke-width="4">
           <circle cx="22" cy="22" r="20" stroke-opacity="0.15"/>
           <path d="M42 22c0-11.046-8.954-20-20-20">
-            <animateTransform
-              attributeName="transform"
-              type="rotate"
-              from="0 22 22"
-              to="360 22 22"
-              dur="0.9s"
-              repeatCount="indefinite"/>
+            <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="0.9s" repeatCount="indefinite"/>
           </path>
         </g>
       </svg>
     </div>
-
     <button class="check-btn" id="checkButton">İçeriği Kontrol Et</button>
+    <div class="theme-toggle-row" id="themeToggleRow">
+      <span id="themeLight" class="theme-icon" title="Açık Tema">
+        <!-- Güneş (Light) SVG -->
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="5.2" stroke="#ffc938" stroke-width="2" fill="#ffe98a"/>
+          <g stroke="#ffc938" stroke-width="2">
+            <line x1="12" y1="1.5" x2="12" y2="4"/>
+            <line x1="12" y1="20" x2="12" y2="22.5"/>
+            <line x1="1.5" y1="12" x2="4" y2="12"/>
+            <line x1="20" y1="12" x2="22.5" y2="12"/>
+            <line x1="5.6" y1="5.6" x2="7.2" y2="7.2"/>
+            <line x1="16.8" y1="16.8" x2="18.4" y2="18.4"/>
+            <line x1="5.6" y1="18.4" x2="7.2" y2="16.8"/>
+            <line x1="16.8" y1="7.2" x2="18.4" y2="5.6"/>
+          </g>
+        </svg>
+      </span>
+      <span id="themeDark" class="theme-icon selected" title="Karanlık Tema">
+        <!-- Ay (Dark) SVG -->
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M18.5 15A8 8 0 0 1 9 5.5a7.97 7.97 0 0 0 8.5 13.5A7.97 7.97 0 0 1 18.5 15Z"
+                stroke="#b5b7f6" stroke-width="2" fill="#232a34"/>
+        </svg>
+      </span>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>

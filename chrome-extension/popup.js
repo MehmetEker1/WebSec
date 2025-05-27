@@ -111,4 +111,33 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   });
+
+  // ----- TEMA DEĞİŞTİRİCİ (GÜNEŞ/AY SİMGESİYLE) -----
+  const themeRoot = document.documentElement;
+  const themeLight = document.getElementById("themeLight");
+  const themeDark = document.getElementById("themeDark");
+
+  function applyTheme(dark) {
+    if (dark) {
+      themeRoot.style.setProperty("--popup-bg", "#181c20");
+      themeRoot.style.setProperty("--text-color", "#eaeaea");
+      themeDark.classList.add("selected");
+      themeLight.classList.remove("selected");
+      localStorage.setItem("websec-theme", "dark");
+    } else {
+      themeRoot.style.setProperty("--popup-bg", "#f7f8fa");
+      themeRoot.style.setProperty("--text-color", "#191b1e");
+      themeLight.classList.add("selected");
+      themeDark.classList.remove("selected");
+      localStorage.setItem("websec-theme", "light");
+    }
+  }
+
+  // İlk açılışta localStorage'dan tema seçimini uygula
+  const userTheme = localStorage.getItem("websec-theme");
+  applyTheme(userTheme !== "light"); // Varsayılan dark
+
+  // İkonlara tıklayınca tema değiştir
+  themeLight.addEventListener("click", () => applyTheme(false));
+  themeDark.addEventListener("click", () => applyTheme(true));
 });
